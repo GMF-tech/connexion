@@ -97,7 +97,7 @@ class FlaskApp(AbstractApp):
                 import tornado.wsgi
                 import tornado.httpserver
                 import tornado.ioloop
-            except:
+            except ImportError:
                 raise Exception('tornado library not installed')
             wsgi_container = tornado.wsgi.WSGIContainer(self.app)
             http_server = tornado.httpserver.HTTPServer(wsgi_container, **options)
@@ -107,13 +107,13 @@ class FlaskApp(AbstractApp):
         elif self.server == 'gevent':
             try:
                 import gevent.wsgi
-            except:
+            except ImportError:
                 raise Exception('gevent library not installed')
             http_server = gevent.wsgi.WSGIServer((self.host, self.port), self.app, **options)
             logger.info('Listening on %s:%s..', self.host, self.port)
             http_server.serve_forever()
         else:
-            raise Exception('Server %s not recognized', self.server)
+            raise Exception('Server {} not recognized'.format(self.server))
 
 
 class FlaskJSONEncoder(json.JSONEncoder):

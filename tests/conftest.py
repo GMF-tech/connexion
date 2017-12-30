@@ -32,14 +32,14 @@ class FakeResponse(object):
 
 @pytest.fixture
 def oauth_requests(monkeypatch):
-    def fake_get(url, params=None, timeout=None):
+    def fake_get(url, params=None, headers=None, timeout=None):
         """
         :type url: str
         :type params: dict| None
         """
-        params = params or {}
+        headers = headers or {}
         if url == "https://oauth.example/token_info":
-            token = params['access_token']
+            token = headers.get('Authorization', 'invalid').split()[-1]
             if token in ["100", "has_myscope"]:
                 return FakeResponse(200, '{"uid": "test-user", "scope": ["myscope"]}')
             if token in ["200", "has_wrongscope"]:
@@ -142,3 +142,8 @@ def unordered_definition_app():
 @pytest.fixture(scope="session")
 def bad_operations_app():
     return build_app_from_fixture('bad_operations', resolver_error=501)
+
+
+@pytest.fixture(scope="session")
+def query_sanitazion():
+    return build_app_from_fixture('query_sanitazion')
